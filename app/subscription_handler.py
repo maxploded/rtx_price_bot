@@ -1,5 +1,6 @@
 import json
 from tinydb import TinyDB, Query
+from os import path as os_path
 
 from parameter_error import ParameterError
 
@@ -14,7 +15,7 @@ def subscribe_user(chat_id, models: list):
     if not models or len(models) == 0:
         raise ParameterError("Please provide model names you want to subscribe to!")
 
-    with open("rtx_models.json") as models_json:
+    with open(os_path.join(os_path.dirname(os_path.abspath(__file__)), "rtx_models.json")) as models_json:
         models_list = json.load(models_json)
         for model in models:
             if model not in models_list:

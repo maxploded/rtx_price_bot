@@ -1,13 +1,10 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from os import path as os_path
 from os import environ
-import logging
 
 import subscription_handler
 import scheduler
 from parameter_error import ParameterError
 
-logging.basicConfig(filename="log.txt", level=logging.DEBUG)
 
 def start(update, context):
     # TODO: Update messages
