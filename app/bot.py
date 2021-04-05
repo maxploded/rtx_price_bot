@@ -19,6 +19,9 @@ def subscribe(update, context):
         result = subscription_handler.subscribe_user(update.effective_chat.id, context.args)
     except ParameterError as e:
         result = str(e)
+    except Exception as e:
+        print(e)
+        return
 
     update.message.reply_text(result)
 
@@ -53,8 +56,5 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        print(e)
+    main()
 
