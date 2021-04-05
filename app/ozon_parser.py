@@ -2,7 +2,7 @@ import requests
 from lxml import html
 
 
-def parse():
+def parse(model):
     headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
         "sec-ch-ua": '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
@@ -17,7 +17,7 @@ def parse():
         "authority": "www.ozon.ru"
     }
 
-    page = requests.get("https://www.ozon.ru/category/videokarty-rtx3080/", headers=headers)
+    page = requests.get(f"https://www.ozon.ru/category/videokarty-rtx{model}/", headers=headers)
 
     tree = html.fromstring(page.content)
     input_element = tree.xpath("//input[@min]")[0]

@@ -24,13 +24,21 @@ def subscribe(update, context):
 
 
 def unsubscribe(update, context):
-    result = subscription_handler.unsubscribe_all(update.effective_chat.id)
+    try:
+        result = subscription_handler.unsubscribe_all(update.effective_chat.id)
+    except Exception as e:
+        print(e)
+        return
 
     update.message.reply_text(result)
 
 
 def check_subscriptions(update, context):
-    result = subscription_handler.check_subscriptions(update.effective_chat.id)
+    try:
+        result = subscription_handler.check_subscriptions(update.effective_chat.id)
+    except Exception as e:
+        print(e)
+        return
 
     update.message.reply_text(result)
 
@@ -47,7 +55,10 @@ def main():
 
     updater.start_polling()
 
-    scheduler.run(updater.bot)
+    try:
+        scheduler.run(updater.bot)
+    except Exception as e:
+        print(e)
 
     updater.idle()
 

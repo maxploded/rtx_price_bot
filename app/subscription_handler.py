@@ -22,7 +22,7 @@ def subscribe_user(chat_id, models: list):
                 raise ParameterError(f"'{model}' is not a supported model")
 
     record = db.search(user.id == chat_id)
-    print(record)
+
     if not record:
         db.insert({"id": chat_id, "models": models})
     else:
@@ -46,6 +46,5 @@ def unsubscribe_all(chat_id):
     return "You are now unsubscribed!"
 
 
-def get_subscribed_users():
-    all_subscriptions = db.all()
-    return [subscription["id"] for subscription in all_subscriptions]
+def get_all_subscriptions():
+    return db.all()
