@@ -1,12 +1,13 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from os import path as os_path
+from os import environ
+import logging
 
-import subscribtion_handler
+import subscription_handler
+import scheduler
 from parameter_error import ParameterError
 
-with open(os_path.abspath(os_path.join(os_path.dirname(__file__), "../BOT_TOKEN.txt")), "r") as token_file:
-    TOKEN = token_file.read().strip()
-
+logging.basicConfig(filename="log.txt", level=logging.DEBUG)
 
 def start(update, context):
     # TODO: Update messages
@@ -15,7 +16,7 @@ def start(update, context):
 
 def subscribe(update, context):
     try:
-        result = subscribtion_handler.subscribe_user(update.effective_chat.id, context.args)
+        result = subscription_handler.subscribe_user(update.effective_chat.id, context.args)
     except ParameterError as e:
         result = str(e)
 
@@ -23,19 +24,20 @@ def subscribe(update, context):
 
 
 def unsubscribe(update, context):
-    result = subscribtion_handler.unsubscribe_all(update.effective_chat.id)
+    result = subscription_handler.unsubscribe_all(update.effective_chat.id)
 
     update.message.reply_text(result)
 
 
 def check_subscriptions(update, context):
-    result = subscribtion_handler.check_subscriptions(update.effective_chat.id)
+    result = subscription_handler.check_subscriptions(update.effective_chat.id)
 
     update.message.reply_text(result)
 
 
 def main():
-    updater = Updater(TOKEN, use_context=True)
+    token = environ.get('RTX_TOKEN')
+    updater = Updater(token, use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
@@ -44,6 +46,8 @@ def main():
     dp.add_handler(CommandHandler("unsubscribe", unsubscribe))
 
     updater.start_polling()
+
+    scheduler.run(updater.bot)
 
     updater.idle()
 

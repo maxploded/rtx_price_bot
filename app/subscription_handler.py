@@ -43,3 +43,8 @@ def unsubscribe_all(chat_id):
     db.remove(user.id == chat_id)
 
     return "You are now unsubscribed!"
+
+
+def get_subscribed_users():
+    all_subscriptions = db.all()
+    return [subscription["id"] for subscription in all_subscriptions]

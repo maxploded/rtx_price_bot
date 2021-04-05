@@ -2,3 +2,4 @@ python-telegram-bot
 requests
 lxml
 tinydb
+schedule
