@@ -24,13 +24,13 @@ def subscribe_user(chat_id, models: list):
             if model not in models_list:
                 raise ParameterError(f"'{model}' is not a supported model")
 
-    cur.execute("SELECT * FROM subscriptions where id = %s;", (chat_id,))
+    cur.execute("SELECT * FROM subscriptions where id = %s;", (str(chat_id),))
     record = cur.fetchone()
 
     if not record:
-        cur.execute("INSERT INTO subscriptions (id, models) VALUES (%s, %s);", (chat_id, models))
+        cur.execute("INSERT INTO subscriptions (id, models) VALUES (%s, %s);", (str(chat_id), models))
     else:
-        cur.execute("UPDATE subscriptions SET models = %s WHERE id = %s;", (models, chat_id))
+        cur.execute("UPDATE subscriptions SET models = %s WHERE id = %s;", (models, str(chat_id)))
 
     conn.commit()
 
@@ -38,7 +38,7 @@ def subscribe_user(chat_id, models: list):
 
 
 def check_subscriptions(chat_id):
-    cur.execute("SELECT * FROM subscriptions where id = %s;", (chat_id,))
+    cur.execute("SELECT * FROM subscriptions where id = %s;", (str(chat_id),))
     record = cur.fetchone()
 
     if not record:
@@ -48,7 +48,7 @@ def check_subscriptions(chat_id):
 
 
 def unsubscribe_all(chat_id):
-    cur.execute("DELETE FROM subscriptions where id = %s;", (chat_id,))
+    cur.execute("DELETE FROM subscriptions where id = %s;", (str(chat_id),))
     conn.commit()
 
     return "You are now unsubscribed!"
