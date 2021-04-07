@@ -1,11 +1,14 @@
 import json
-from tinydb import TinyDB, Query
 from os import path as os_path
+import os
+import psycopg2
 
 from parameter_error import ParameterError
 
-db = TinyDB('subscription_db.json')
-user = Query()
+DATABASE_URL = os.environ['DATABASE_URL']
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+# conn = psycopg2.connect(DATABASE_URL)
+cur = conn.cursor()
 
 
 def subscribe_user(chat_id, models: list):
@@ -21,30 +24,37 @@ def subscribe_user(chat_id, models: list):
             if model not in models_list:
                 raise ParameterError(f"'{model}' is not a supported model")
 
-    record = db.search(user.id == chat_id)
+    cur.execute("SELECT * FROM subscriptions where id = %s;", (chat_id,))
+    record = cur.fetchone()
 
     if not record:
-        db.insert({"id": chat_id, "models": models})
+        cur.execute("INSERT INTO subscriptions (id, models) VALUES (%s, %s);", (chat_id, models))
     else:
-        db.update({"models": models}, user.id == chat_id)
+        cur.execute("UPDATE subscriptions SET models = %s WHERE id = %s;", (models, chat_id))
+
+    conn.commit()
 
     return f"You are now subscribed to {models}"
 
 
 def check_subscriptions(chat_id):
-    record = db.search(user.id == chat_id)
+    cur.execute("SELECT * FROM subscriptions where id = %s;", (chat_id,))
+    record = cur.fetchone()
 
     if not record:
         return "You are not subscribed to any models yet!"
     else:
-        return f"You are subscribed to {record[0]['models']}"
+        return f"You are subscribed to {record[1]}"
 
 
 def unsubscribe_all(chat_id):
-    db.remove(user.id == chat_id)
+    cur.execute("DELETE FROM subscriptions where id = %s;", (chat_id,))
+    conn.commit()
 
     return "You are now unsubscribed!"
 
 
 def get_all_subscriptions():
-    return db.all()
+    cur.execute("SELECT * FROM subscriptions;")
+    records = cur.fetchall()
+    return [{"id": subscription[0], "model": subscription[1]} for subscription in records]
