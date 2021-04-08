@@ -57,4 +57,4 @@ def unsubscribe_all(chat_id):
 def get_all_subscriptions():
     cur.execute("SELECT * FROM subscriptions;")
     records = cur.fetchall()
-    return [{"id": subscription[0], "model": subscription[1]} for subscription in records]
+    return [{"id": subscription[0], "models": subscription[1]} for subscription in records]
