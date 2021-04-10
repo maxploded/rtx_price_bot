@@ -1,11 +1,10 @@
 import json
-from os import path as os_path
-import os
+from os import path as os_path, environ
 import psycopg2
 
 from parameter_error import ParameterError
 
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 # conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
@@ -18,11 +17,11 @@ def subscribe_user(chat_id, models: list):
     if not models or len(models) == 0:
         raise ParameterError("Please provide model names you want to subscribe to!")
 
-    with open(os_path.join(os_path.dirname(os_path.abspath(__file__)), "rtx_models.json")) as models_json:
-        models_list = json.load(models_json)
-        for model in models:
-            if model not in models_list:
-                raise ParameterError(f"'{model}' is not a supported model")
+    models_list = get_available_models()
+
+    for model in models:
+        if model not in models_list:
+            raise ParameterError(f"'{model}' is not a supported model")
 
     cur.execute("SELECT * FROM subscriptions where id = %s;", (str(chat_id),))
     record = cur.fetchone()
@@ -58,3 +57,10 @@ def get_all_subscriptions():
     cur.execute("SELECT * FROM subscriptions;")
     records = cur.fetchall()
     return [{"id": subscription[0], "models": subscription[1]} for subscription in records]
+
+
+def get_available_models():
+    with open(os_path.join(os_path.dirname(os_path.abspath(__file__)), "rtx_models.json")) as models_json:
+        models_list = json.load(models_json)
+
+    return models_list
