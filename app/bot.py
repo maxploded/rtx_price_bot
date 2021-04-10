@@ -1,5 +1,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from os import environ
+import traceback
 
 import subscription_handler
 import scheduler
@@ -16,8 +17,8 @@ def subscribe(update, context):
         result = subscription_handler.subscribe_user(update.effective_chat.id, context.args)
     except ParameterError as e:
         result = str(e)
-    except Exception as e:
-        print(e)
+    except:
+        traceback.print_exc()
         return
 
     update.message.reply_text(result)
@@ -26,8 +27,8 @@ def subscribe(update, context):
 def unsubscribe(update, context):
     try:
         result = subscription_handler.unsubscribe_all(update.effective_chat.id)
-    except Exception as e:
-        print(e)
+    except:
+        traceback.print_exc()
         return
 
     update.message.reply_text(result)
@@ -36,8 +37,8 @@ def unsubscribe(update, context):
 def check_subscriptions(update, context):
     try:
         result = subscription_handler.check_subscriptions(update.effective_chat.id)
-    except Exception as e:
-        print(e)
+    except:
+        traceback.print_exc()
         return
 
     update.message.reply_text(result)
@@ -57,8 +58,8 @@ def main():
 
     try:
         scheduler.run(updater.bot)
-    except Exception as e:
-        print(e)
+    except:
+        traceback.print_exc()
 
     updater.idle()
 
