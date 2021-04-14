@@ -51,6 +51,9 @@ def parse(model):
         except:
             pass
 
+    if not prices:
+        return None
+
     min_price = min(prices)
     max_price = max(prices)
 
