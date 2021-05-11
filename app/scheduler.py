@@ -8,6 +8,8 @@ import ozon_parser
 import ekatalog_parser
 import subscription_handler
 
+from telegram.error import Unauthorized
+
 
 def job(bot):
     result = {}
@@ -49,7 +51,10 @@ def job(bot):
             if ekatalog:
                 message += f"\n e-katalog.ru: {ekatalog[0]} - {ekatalog[1]}"
 
-            bot.send_message(subscription["id"], message)
+            try:
+                bot.send_message(subscription["id"], message)
+            except Unauthorized:
+                subscription_handler.unsubscribe_all(subscription["id"])
 
 
 def run(bot):
